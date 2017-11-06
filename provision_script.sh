@@ -25,6 +25,9 @@ ln -s /vagrant/var_www /var/www
 # mysql -uroot -p$DBPASSWD -e "CREATE DATABASE $DBNAME"
 # mysql -uroot -p$DBPASSWD -e "grant all privileges on $DBNAME.* to '$DBUSER'@'localhost' identified by '$DBPASSWD'"
 
+# Instalando memcached
+apt-get -y install memcached
+# Para configurar o memcached -> $ vim /etc/memcached.conf
 
 # Instalando PHP
 apt-get -y install php libapache2-mod-php php-curl php-mcrypt php-mysql php-gd php-gettext php-memcached php-cli
@@ -45,6 +48,8 @@ sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.0/apache2/php.ini
 
 # Reiniciando o Apache para aplicar todas as configs
 systemctl restart apache2
+
+
 
 
 
