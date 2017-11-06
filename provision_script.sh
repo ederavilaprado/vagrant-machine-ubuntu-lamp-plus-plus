@@ -1,8 +1,8 @@
 # Default Variables
-DBHOST=localhost
-DBNAME=db
-DBUSER=dbuser
-DBPASSWD=12345678
+# DBHOST=localhost
+# DBNAME=db
+# DBUSER=dbuser
+# DBPASSWD=12345678
 
 # Instalação geral
 apt-get update
@@ -18,13 +18,33 @@ ufw allow in "Apache Full"
 rm -rf /var/www
 ln -s /vagrant/var_www /var/www
 
-# Instalando MySql com db defautl
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $DBPASSWD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $DBPASSWD"
-apt-get -y install mysql-server
+# # Instalando e configurando MySql como db defautl
+# debconf-set-selections <<< "mysql-server mysql-server/root_password password $DBPASSWD"
+# debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $DBPASSWD"
+# apt-get -y install mysql-server
+# mysql -uroot -p$DBPASSWD -e "CREATE DATABASE $DBNAME"
+# mysql -uroot -p$DBPASSWD -e "grant all privileges on $DBNAME.* to '$DBUSER'@'localhost' identified by '$DBPASSWD'"
 
-mysql -uroot -p$DBPASSWD -e "CREATE DATABASE $DBNAME"
-mysql -uroot -p$DBPASSWD -e "grant all privileges on $DBNAME.* to '$DBUSER'@'localhost' identified by '$DBPASSWD'"
+
+# Instalando PHP
+apt-get -y install php libapache2-mod-php php-curl php-mcrypt php-mysql php-gd php-gettext php-memcached php-cli
+
+# Instalando composer para PHP
+curl --silent https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+
+# Instalando mod_rewrite para php
+a2enmod rewrite
+
+# Allowing Apache override to all
+sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/apache2.conf
+
+# Alterando para exibir os erros do PHP no browser
+sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.0/apache2/php.ini
+sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.0/apache2/php.ini
+
+# Reiniciando o Apache para aplicar todas as configs
+systemctl restart apache2
 
 
 
@@ -32,24 +52,6 @@ mysql -uroot -p$DBPASSWD -e "grant all privileges on $DBNAME.* to '$DBUSER'@'loc
 
 
 ################################################################
-
-
-
-
-
-
-# debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
-# debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password $DBPASSWD"
-# debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password $DBPASSWD"
-# debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password $DBPASSWD"
-# debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none"
-# apt-get -y install mysql-server phpmyadmin
-
-
-
-# echo -e "\n--- Installing Composer for PHP package management ---\n"
-# curl --silent https://getcomposer.org/installer | php
-# mv composer.phar /usr/local/bin/composer
 
 
 # apt-get -y install nginx
